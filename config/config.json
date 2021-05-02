@@ -1,0 +1,11 @@
+{
+	"development-local": {
+		"backendHost": "localhost:3000"
+	},
+	"development-heroku": {
+		"backendHost": "api-herokuapp.com"
+	},
+	"production": {
+		"backendHost": "api.veryfax.com"
+	}
+}

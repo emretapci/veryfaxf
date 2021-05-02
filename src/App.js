@@ -6,17 +6,25 @@ import {
 	Redirect,
 	Link
 } from "react-router-dom";
-import Signup from "./SignUp";
+import SignUp from "./SignUp";
+import SignIn from "./SignIn";
+import Dashboard from "./Dashboard";
 
 const App = props => {
 	return (
 		<Router>
 			<Switch>
 				<Route exact path="/">
-					<Redirect to="/signup"/>
+					<Redirect to="/signin"/>
 				</Route>
 				<Route path="/signup">
-					<Signup />
+					<SignUp />
+				</Route>
+				<Route path="/signin">
+					<SignIn />
+				</Route>
+				<Route path="/dashboard">
+					<Dashboard />
 				</Route>
 			</Switch>
 		</Router>
