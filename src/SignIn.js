@@ -82,6 +82,7 @@ export default () => {
 								name="email"
 								autoComplete="email"
 								onChange={event => setEmail(event.target.value)}
+								onKeyPress={event => event.key == 'Enter' && signIn()}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -95,6 +96,7 @@ export default () => {
 								id="password"
 								autoComplete="current-password"
 								onChange={event => setPassword(event.target.value)}
+								onKeyPress={event => event.key == 'Enter' && signIn()}
 							/>
 						</Grid>
 					</Grid>

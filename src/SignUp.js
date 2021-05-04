@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -13,6 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Copyright from './Copyright';
+import axios from "axios";
+import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
@@ -37,6 +39,30 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUp() {
 	const classes = useStyles();
 
+	const [firstName, setFirstName] = useState();
+	const [lastName, setLastName] = useState();
+	const [email, setEmail] = useState();
+	const [password1, setPassword1] = useState();
+	const [password2, setPassword2] = useState();
+	const [passwordsMatch, setPasswordsMatch] = useState(true);
+	const [loggedIn, setLoggedIn] = useState(false);
+
+	useEffect(() => setPasswordsMatch(password1 == password2), [password1, password2]);
+
+	const signUp = async () => {
+		let res = await axios({
+			method: 'post',
+			url: process.env.REACT_APP_BACKEND_URL + '/login',
+			withCredentials: true,
+			data: {
+				firstName, lastName, email, password: password1
+			}
+		});
+
+		if (res.status == 200)
+			setLoggedIn(true);
+	}
+
 	return (
 		<Container component="main" maxWidth="xs">
 			<CssBaseline />
@@ -59,6 +85,8 @@ export default function SignUp() {
 								id="firstName"
 								label="First Name"
 								autoFocus
+								onChange={event => setFirstName(event.target.value)}
+								onKeyPress={event => event.key == 'Enter' && signUp()}
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
@@ -70,6 +98,8 @@ export default function SignUp() {
 								label="Last Name"
 								name="lastName"
 								autoComplete="lname"
+								onChange={event => setLastName(event.target.value)}
+								onKeyPress={event => event.key == 'Enter' && signUp()}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -81,6 +111,8 @@ export default function SignUp() {
 								label="Email Address"
 								name="email"
 								autoComplete="email"
+								onChange={event => setEmail(event.target.value)}
+								onKeyPress={event => event.key == 'Enter' && signUp()}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -88,26 +120,44 @@ export default function SignUp() {
 								variant="outlined"
 								required
 								fullWidth
-								name="password"
+								name="password1"
 								label="Password"
 								type="password"
-								id="password"
-								autoComplete="current-password"
+								id="password1"
+								autoComplete="new-password"
+								onChange={event => setPassword1(event.target.value)}
+								onKeyPress={event => event.key == 'Enter' && signUp()}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<FormControlLabel
-								control={<Checkbox value="allowExtraEmails" color="primary" />}
-								label="I want to receive inspiration, marketing promotions and updates via email."
+							<TextField
+								variant="outlined"
+								required
+								fullWidth
+								name="password2"
+								label="Repeat Password"
+								type="password"
+								id="password2"
+								autoComplete="repeat-password"
+								onChange={event => setPassword2(event.target.value)}
+								onKeyPress={event => event.key == 'Enter' && signUp()}
 							/>
+						</Grid>
+						<Grid item xs={12}>
+							{!passwordsMatch ?
+								<Typography align="center" color="error">
+									Passwords do not match
+								</Typography>
+								: null
+							}
 						</Grid>
 					</Grid>
 					<Button
-						type="submit"
 						fullWidth
 						variant="contained"
 						color="primary"
 						className={classes.submit}
+						onClick={signUp}
 					>
 						Sign Up
          			</Button>
