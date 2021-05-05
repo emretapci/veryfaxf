@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SignUp from "./SignUp";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -37,11 +38,14 @@ const useStyles = makeStyles((theme) => ({
 export default props => {
 	const classes = useStyles();
 
-	const [user, setUser] = useState();
+	const [signup, setSignup] = useState(false);
 	const [email, setEmail] = useState();
 	const [password, setPassword] = useState();
-	const [loggedIn, setLoggedIn] = useState(false);
 	const [errorText, setErrorText] = useState([]);
+
+	if (signup) {
+		return <SignUp exit={() => setSignup(false)} />
+	}
 
 	const signIn = async () => {
 		let res = await axios({
@@ -57,8 +61,8 @@ export default props => {
 		let errorText2 = [];
 		switch (res.status) {
 			case 200:
-				setUser(res.data.user);
-				setLoggedIn(true);
+				console.log(res.data);
+				props.setUser(res.data.user);
 				setErrorText([]);
 				break;
 			case 401:
@@ -72,11 +76,6 @@ export default props => {
 				setErrorText(errorText2);
 				break;
 		}
-	}
-
-	const signUp = () => {
-		props.setPage('SignUp');
-		return;
 	}
 
 	return (
@@ -140,7 +139,7 @@ export default props => {
          			</Button>
 					<Grid container justify="flex-end">
 						<Grid item>
-							<Link onClick={signUp}>
+							<Link onClick={() => setSignup(true)}>
 								Not registered? Sign up
             				</Link>
 						</Grid>
