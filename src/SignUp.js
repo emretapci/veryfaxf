@@ -3,8 +3,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -36,31 +34,54 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-export default function SignUp() {
+export default props => {
 	const classes = useStyles();
 
+	const [user, setUser] = useState();
 	const [firstName, setFirstName] = useState();
 	const [lastName, setLastName] = useState();
 	const [email, setEmail] = useState();
 	const [password1, setPassword1] = useState();
 	const [password2, setPassword2] = useState();
-	const [passwordsMatch, setPasswordsMatch] = useState(true);
+	const [errorText, setErrorText] = useState([]);
 	const [loggedIn, setLoggedIn] = useState(false);
 
-	useEffect(() => setPasswordsMatch(password1 == password2), [password1, password2]);
+	useEffect(() => {
+		if (password1 != password2)
+			setErrorText(['Passwords do not match']);
+		else
+			setErrorText([]);
+	}, [password1, password2]);
 
 	const signUp = async () => {
 		let res = await axios({
 			method: 'post',
-			url: process.env.REACT_APP_BACKEND_URL + '/login',
+			url: process.env.REACT_APP_BACKEND_URL + '/users',
 			withCredentials: true,
 			data: {
 				firstName, lastName, email, password: password1
-			}
+			},
+			validateStatus: () => true
 		});
 
-		if (res.status == 200)
-			setLoggedIn(true);
+		let errorText2 = [];
+		switch (res.status) {
+			case 201:
+				setUser(res.data.user);
+				setLoggedIn(true);
+				setErrorText([]);
+				break;
+			case 409:
+				errorText2.push(`User with e-mail ${email} is already registered.`);
+				/* TODO: fetch the existing user, check if the e-mail is not confirmed, if not, push "re-send e-mail confirmation" link to array*/
+				setErrorText(errorText2);
+				break;
+		}
+	}
+
+	if (loggedIn) {
+		props.setUser(user);
+		return <Redirect to='/dashboard' />
 	}
 
 	return (
@@ -144,10 +165,12 @@ export default function SignUp() {
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							{!passwordsMatch ?
-								<Typography align="center" color="error">
-									Passwords do not match
-								</Typography>
+							{errorText && errorText.length > 0 ?
+								errorText.map(e => (
+									<Typography align="center" color="error">
+										{e}
+									</Typography>
+								))
 								: null
 							}
 						</Grid>

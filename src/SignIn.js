@@ -3,8 +3,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -36,12 +34,14 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-export default () => {
+export default props => {
 	const classes = useStyles();
 
+	const [user, setUser] = useState();
 	const [email, setEmail] = useState();
 	const [password, setPassword] = useState();
 	const [loggedIn, setLoggedIn] = useState(false);
+	const [errorText, setErrorText] = useState([]);
 
 	const signIn = async () => {
 		let res = await axios({
@@ -50,15 +50,34 @@ export default () => {
 			withCredentials: true,
 			data: {
 				email, password
-			}
+			},
+			validateStatus: () => true
 		});
 
-		if (res.status == 200)
-			setLoggedIn(true);
+		let errorText2 = [];
+		switch (res.status) {
+			case 200:
+				setUser(res.data.user);
+				setLoggedIn(true);
+				setErrorText([]);
+				break;
+			case 401:
+				errorText2.push(`Invalid password.`);
+				errorText2.push(<Link>Forgot password?</Link>)
+				setErrorText(errorText2);
+				break;
+			case 404:
+				errorText2 = [];
+				errorText2.push(`User with e-mail ${email} not found.`);
+				setErrorText(errorText2);
+				break;
+		}
 	}
 
-	if (loggedIn)
-		return <Redirect to='/dashboard' />
+	const signUp = () => {
+		props.setPage('SignUp');
+		return;
+	}
 
 	return (
 		<Container component="main" maxWidth="xs">
@@ -99,6 +118,16 @@ export default () => {
 								onKeyPress={event => event.key == 'Enter' && signIn()}
 							/>
 						</Grid>
+						<Grid item xs={12}>
+							{errorText && errorText.length > 0 ?
+								errorText.map(e => (
+									<Typography align="center" color="error">
+										{e}
+									</Typography>
+								))
+								: null
+							}
+						</Grid>
 					</Grid>
 					<Button
 						fullWidth
@@ -111,7 +140,7 @@ export default () => {
          			</Button>
 					<Grid container justify="flex-end">
 						<Grid item>
-							<Link href="/signup" variant="body2">
+							<Link onClick={signUp}>
 								Not registered? Sign up
             				</Link>
 						</Grid>

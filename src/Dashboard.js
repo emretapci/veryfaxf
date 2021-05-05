@@ -1,30 +1,57 @@
 import React, { useState } from 'react';
-import Drawer from '@material-ui/core/Drawer'
 import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import PhoneIcon from '@material-ui/icons/Phone';
+import { Phone as PhoneIcon, Menu as MenuIcon } from '@material-ui/icons';
+import axios from "axios";
+import { AppBar, Toolbar, Button, IconButton, Typography } from '@material-ui/core';
+import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
+	root: {
+		flexGrow: 1,
+	},
+	menuButton: {
+		marginRight: theme.spacing(2),
+	},
+	title: {
+		flexGrow: 1,
+	},
 }));
 
 export default props => {
 	const classes = useStyles();
 
+	const [loggedIn, setLoggedIn] = useState(true);
+
+	const logout = async () => {
+		let res = await axios({
+			method: 'delete',
+			url: process.env.REACT_APP_BACKEND_URL + '/logout',
+			withCredentials: true,
+			validateStatus: () => true
+		});
+		setLoggedIn(false);
+	}
+
+	if (!loggedIn) {
+		props.setUser(null);
+		return <div/>;
+	}
+
 	return (
-		<Drawer anchor='left' open='true'>
-			<List>
-				{['+1 576 5847384', '+1 645 2544356'].map((text, index) => (
-					<ListItem button key={text}>
-						<ListItemIcon>
-							<PhoneIcon/>
-						</ListItemIcon>
-						<ListItemText primary={text} />
-					</ListItem>
-				))}
-			</List>
-		</Drawer>
+		<React.Fragment>
+			<AppBar position='static'>
+				<Toolbar>
+					<IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+						<MenuIcon />
+					</IconButton>
+					<Typography variant="h6" className={classes.title}>
+						News
+    				</Typography>
+					<Typography color="inherit">{props.user.email}</Typography>
+					<Typography color="inherit">{props.user.emailApproved ? '[e-mail approved]' : '[e-mail not approved]'}</Typography>
+					<Button color="inherit" onClick={logout}>Logout</Button>
+				</Toolbar>
+			</AppBar>
+		</React.Fragment>
 	);
 }
