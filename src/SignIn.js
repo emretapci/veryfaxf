@@ -4,8 +4,9 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { Link, Grid, TextField, Container, Typography, styles as makeStyles } from '@material-ui/core';
+import { Link, Grid, TextField, Container, Typography, makeStyles } from '@material-ui/core';
 import Copyright from './Copyright';
+import Session from "./Session";
 import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
@@ -71,6 +72,11 @@ export default props => {
 	const signUp = () => {
 		props.setPage('SignUp');
 		return;
+	}
+
+	if (loggedIn) {
+		props.setUser(user);
+		return <Redirect to='/portal' />
 	}
 
 	return (

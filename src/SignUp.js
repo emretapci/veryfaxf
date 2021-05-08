@@ -81,7 +81,7 @@ export default props => {
 
 	if (loggedIn) {
 		props.setUser(user);
-		return <Redirect to='/dashboard' />
+		return <Redirect to='/portal' />
 	}
 
 	return (
