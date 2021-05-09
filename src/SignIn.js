@@ -8,7 +8,6 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Link, Grid, TextField, Container, Typography, makeStyles } from '@material-ui/core';
 import Copyright from './Copyright';
 import axios from "axios";
-import SignUp from './SignUp';
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
