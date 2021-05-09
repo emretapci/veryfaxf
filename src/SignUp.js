@@ -28,14 +28,12 @@ const useStyles = makeStyles((theme) => ({
 export default props => {
 	const classes = useStyles();
 
-	const [user, setUser] = useState();
 	const [firstName, setFirstName] = useState();
 	const [lastName, setLastName] = useState();
 	const [email, setEmail] = useState();
 	const [password1, setPassword1] = useState();
 	const [password2, setPassword2] = useState();
 	const [errorText, setErrorText] = useState([]);
-	const [loggedIn, setLoggedIn] = useState(false);
 
 	useEffect(() => {
 		if (password1 != password2)
@@ -55,24 +53,16 @@ export default props => {
 			validateStatus: () => true
 		});
 
-		let errorText2 = [];
 		switch (res.status) {
 			case 201:
-				setUser(res.data.user);
-				setLoggedIn(true);
+				props.setUser(res.data.user);
 				setErrorText([]);
 				break;
 			case 409:
-				errorText2.push(`User with e-mail ${email} is already registered.`);
 				/* TODO: fetch the existing user, check if the e-mail is not confirmed, if not, push "re-send e-mail confirmation" link to array*/
-				setErrorText(errorText2);
+				setErrorText([`User with e-mail ${email} is already registered.`]);
 				break;
 		}
-	}
-
-	if (loggedIn) {
-		props.setUser(user);
-		return <Redirect to='/dashboard' />
 	}
 
 	return (
@@ -177,9 +167,15 @@ export default props => {
          			</Button>
 					<Grid container justify="flex-end">
 						<Grid item>
-							<Link onClick={props.exit}>
+							<Button
+								fullWidth
+								variant="contained"
+								color="primary"
+								className={classes.submit}
+								onClick={() => props.setSignUp(false)}
+							>
 								Already have an account? Sign in
-            				</Link>
+							</Button>
 						</Grid>
 					</Grid>
 				</form>

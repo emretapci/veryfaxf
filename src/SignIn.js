@@ -3,17 +3,12 @@ import SignUp from "./SignUp";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import { Link, Grid, TextField, Container, Typography, makeStyles } from '@material-ui/core';
 import Copyright from './Copyright';
 import axios from "axios";
-import { Redirect } from 'react-router-dom';
+import SignUp from './SignUp';
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
@@ -38,14 +33,13 @@ const useStyles = makeStyles((theme) => ({
 export default props => {
 	const classes = useStyles();
 
-	const [signup, setSignup] = useState(false);
+	const [signUp, setSignUp] = useState(false);
 	const [email, setEmail] = useState();
 	const [password, setPassword] = useState();
 	const [errorText, setErrorText] = useState([]);
 
-	if (signup) {
-		return <SignUp exit={() => setSignup(false)} />
-	}
+	if (signUp)
+		return <SignUp setSignUp={setSignUp} setUser={props.setUser} />
 
 	const signIn = async () => {
 		let res = await axios({
@@ -58,22 +52,19 @@ export default props => {
 			validateStatus: () => true
 		});
 
-		let errorText2 = [];
 		switch (res.status) {
 			case 200:
-				console.log(res.data);
 				props.setUser(res.data.user);
 				setErrorText([]);
 				break;
 			case 401:
-				errorText2.push(`Invalid password.`);
-				errorText2.push(<Link>Forgot password?</Link>)
-				setErrorText(errorText2);
+				setErrorText([
+					`Invalid password.`,
+					<Link>Forgot password?</Link>
+				]);
 				break;
 			case 404:
-				errorText2 = [];
-				errorText2.push(`User with e-mail ${email} not found.`);
-				setErrorText(errorText2);
+				setErrorText([`User with e-mail ${email} not found.`]);
 				break;
 		}
 	}
@@ -139,9 +130,15 @@ export default props => {
          			</Button>
 					<Grid container justify="flex-end">
 						<Grid item>
-							<Link onClick={() => setSignup(true)}>
+							<Button
+								fullWidth
+								variant="contained"
+								color="primary"
+								className={classes.submit}
+								onClick={() => setSignUp(true)}
+							>
 								Not registered? Sign up
-            				</Link>
+							</Button>
 						</Grid>
 					</Grid>
 				</form>
