@@ -1,33 +1,23 @@
-import './App.css';
-import {
-	BrowserRouter as Router,
-	Switch,
-	Route,
-	Redirect
-} from "react-router-dom";
-import SignUp from "./SignUp";
+import React, { useState, useEffect } from 'react';
 import SignIn from "./SignIn";
 import Portal from "./Portal";
+import getSessionUser from "./Session";
 
 const App = props => {
-	return (
-		<Router>
-			<Switch>
-				<Route exact path="/">
-					<Redirect to="/signin"/>
-				</Route>
-				<Route path="/signup">
-					<SignUp />
-				</Route>
-				<Route path="/signin">
-					<SignIn />
-				</Route>
-				<Route path="/portal">
-					<Portal />
-				</Route>
-			</Switch>
-		</Router>
-	);
+	const [user, setUser] = useState(null);
+
+	useEffect(() => {
+		getSessionUser().then(user => {
+			setUser(user);
+		});
+	}, []);
+
+	if (user) {
+		return <Portal user={user} setUser={setUser} />
+	}
+	else {
+		return <SignIn setUser={setUser} />
+	}
 }
 
 export default App;

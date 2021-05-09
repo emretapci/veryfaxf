@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,6 +17,7 @@ import Conversations from './Conversations';
 import Numbers from './Numbers';
 import Credits from './Credits';
 import axios from "axios";
+import getLoggedInUser from './Session';
 
 const drawerWidth = 240;
 
@@ -71,16 +72,16 @@ const Portal = props => {
 		setMobileOpen(!mobileOpen);
 	};
 
-	const signout = async () => {
-		let res = await axios({
+	const signOut = async () => {
+		await axios({
 			method: 'delete',
 			url: process.env.REACT_APP_BACKEND_URL + '/logout',
 			withCredentials: true,
 			validateStatus: () => true
 		});
-		setLoggedIn(false);
+		props.setUser(null);
 	}
-
+	
 	const drawer = (
 		<div>
 			<div className={classes.toolbar} />
@@ -94,7 +95,7 @@ const Portal = props => {
 			</List>
 			<Divider />
 			<List>
-				<ListItem button key='signout' onClick={signout}>
+				<ListItem button key='signout' onClick={signOut}>
 					<ListItemText primary={'Sign out'} />
 				</ListItem>
 			</List>
